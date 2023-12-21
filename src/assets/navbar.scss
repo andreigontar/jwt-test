@@ -1,7 +1,14 @@
 #login {
-    margin: 0 0 0 auto;
     display: flex;
 }
 .navbar {
     margin-bottom: 30px;
+    .homeLink {
+        margin-right: 20px;
+    }
+    .credentials {
+        display: flex;
+        align-items: center;
+        margin: 0 20px 0 auto;
+    }
 }

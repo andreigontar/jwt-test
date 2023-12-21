@@ -5,11 +5,14 @@ export default function admin (next){
     const userStore = useUserStore()
     const {role} = storeToRefs(userStore)
 
-    for (let group of role.value) {
-        if (group === 'Admin') {
-            next();
+    if (role.value && !!role.value.length) {
+        if (role.value.find(role => role === 'Admin')) {
+            next()
         } else {
             next('/')
         }
+    } else {
+        console.log('else')
+        next('/')
     }
 }

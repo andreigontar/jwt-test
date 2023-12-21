@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { jwtDecode } from 'jwt-decode';
 import {useMockJWTStore} from "./mockJWTStore";
-import {computed, nextTick} from "vue";
+import {computed, ref} from "vue";
 import {useRouter} from "vue-router";
 
 export const useUserStore = defineStore('user', () => {
@@ -9,15 +9,13 @@ export const useUserStore = defineStore('user', () => {
     const mockJWTStore = useMockJWTStore()
     const router = useRouter()
 
-    const user = computed(() => {
-        get: JSON.parse(localStorage.getItem('user')),
-        set: (value) => {
-            user.value = value
-        }
-    })
+    const user = ref(JSON.parse(localStorage.getItem('user')))
     const role = computed(() => user.value ? user.value['cognito:groups'] : null)
-
     const isLogedIn = computed(() => !!role.value)
+
+    const name = computed(() => user.value ? user.value['given_name'] : null)
+    const email = computed(() => user.value ? user.value['email'] : null)
+
 
     const login = async (credentials) => {
         let response = await mockJWTStore.auth(credentials)
@@ -25,21 +23,24 @@ export const useUserStore = defineStore('user', () => {
         if (response) {
             const token = jwtDecode(response.token)
             localStorage.setItem('user', JSON.stringify(token))
+
+            setUser()
+            await router.push({path: role.value.find(role => role === 'Admin') ? '/admin' : '/'})
         }
     }
     const logout = async () => {
-        user.value = null
-        console.log('logout')
         localStorage.removeItem('user')
-        await nextTick()
-        console.log('1')
+        user.value = null
         await router.push({path: '/'})
-        console.log('2')
     }
+
+    const setUser = () => user.value = JSON.parse(localStorage.getItem('user'))
 
     return {
         role,
         isLogedIn,
+        name,
+        email,
         logout,
         login,
     }

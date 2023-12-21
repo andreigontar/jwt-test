@@ -26,7 +26,7 @@ const router = createRouter({
             }
         },
         {
-            path: '/card',
+            path: '/card/:id',
             name: 'card',
             component: AppCard,
             meta: {
